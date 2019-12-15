@@ -15,6 +15,8 @@ export const getIndexList = server => {
       .then(res => {
         let { list } = res.data
         dispatch(changeList(list))
+      }).catch(err => {
+        dispatch(changeList([]))
       })
   }
 }

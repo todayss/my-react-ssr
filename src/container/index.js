@@ -10,7 +10,6 @@ function Index(props) {
     }
 
   }, [])
-  console.log("props.list", props.list)
   return <div>
     <h1>开课吧&& {count}</h1>
     <button onClick={() => setCount(count + 1)}>+1</button>

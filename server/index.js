@@ -9,7 +9,6 @@ import { Provider } from 'react-redux'
 import Header from '../src/component/Header'
 
 const store = getServerStore()
-//console.log(store.getState())
 const app = express()
 app.use(express.static("public"))
 
@@ -25,7 +24,8 @@ app.get("*", (req, res) => {
     }
   })
   Promise.all(promises)
-    .then(() => {
+    .then((result) => {
+      console.log("res", result)
       const content = renderToString(
         <Provider store={store}>
           <StaticRouter location={req.url} >
@@ -55,6 +55,9 @@ app.get("*", (req, res) => {
     </body>
     </html>
     `)
+    }).catch(err => {
+      console.log(err)
+      res.send("报错了")
     })
 })
 
