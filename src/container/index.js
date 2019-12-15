@@ -5,9 +5,12 @@ import { getIndexList } from '../store/index'
 function Index(props) {
   let [count, setCount] = useState(1)
   useEffect(() => {
-    props.getIndexList()
+    if (!props.list.length) {
+      props.getIndexList()
+    }
 
   }, [])
+  console.log("props.list", props.list)
   return <div>
     <h1>开课吧&& {count}</h1>
     <button onClick={() => setCount(count + 1)}>+1</button>
@@ -22,6 +25,10 @@ function Index(props) {
       }
     </ul>
   </div>
+}
+
+Index.loadData = (store) => {
+  return store.dispatch(getIndexList())
 }
 
 export default connect(

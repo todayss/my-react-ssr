@@ -1,61 +1,63 @@
 //node 代码， babel解析
 import React from 'react'
 import { renderToString } from 'react-dom/server'
-import App from '../src/index'
+import routes from '../src/index'
 import express from 'express'
-import { StaticRouter } from 'react-router-dom'
-import store from '../src/store/store'
+import { StaticRouter, matchPath, Route } from 'react-router-dom'
+import { getServerStore } from '../src/store/store'
 import { Provider } from 'react-redux'
+import Header from '../src/component/Header'
 
+const store = getServerStore()
+//console.log(store.getState())
 const app = express()
 app.use(express.static("public"))
 
 app.get("*", (req, res) => {
-  const content = renderToString(
-    <Provider store={store}>
-      <StaticRouter location={req.url} >
-        {App}
-      </StaticRouter>
-    </Provider>
-  )
-  res.send(`
-  <!DOCTYPE html>
-  <html lang="en">
-  <head>
-    <meta charset="UTF-8">
-    <title>开课吧</title>
-    
-  </head>
-  <body>
-    <div id="root">${content}</div>
-    <script src="/bundle.js"></script>
-  </body>
-  </html>
-  `)
+  const promises = []
+  routes.map(route => {
+    const match = matchPath(req.path, route)
+    if (match) {
+      const { loadData } = route.component
+      if (loadData) {
+        promises.push(loadData(store))
+      }
+    }
+  })
+  Promise.all(promises)
+    .then(() => {
+      const content = renderToString(
+        <Provider store={store}>
+          <StaticRouter location={req.url} >
+            <Header></Header>
+            {
+              routes.map(route => {
+                return <Route {...route} />
+              })
+            }
+          </StaticRouter>
+        </Provider>
+      )
+      res.send(`
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+      <meta charset="UTF-8">
+      <title>开课吧</title>
+      
+    </head>
+    <body>
+      <div id="root">${content}</div>
+      <script>
+      window._context = ${JSON.stringify(store.getState())}
+      </script>
+      <script src="/bundle.js"></script>
+    </body>
+    </html>
+    `)
+    })
 })
 
 app.listen(8000, () => {
   console.log("server is running")
 })
-
-
-// import React from 'react';
-// import { renderToString } from 'react-dom/server';
-// import express from 'express';
-// import App from '../src/index.js';
-
-// const app = express();
-// app.use(express.static('public'));
-// app.get('/', (req, res) => {
-//   const content = renderToString(App);
-//   res.send(`<html>
-//   <head><meta charset="utf-8"><title>react ssr</title></head
-//   <body>
-//   <div id="root">${content}</div></body>
-//   <script src="/bundle.js"></script>
-//   </html>`)
-// })
-
-// app.listen('8000', () => {
-//   console.log('success')
-// })

@@ -102,16 +102,20 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _src_index__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../src/index */ "./src/index.js");
 /* harmony import */ var react_router_dom__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! react-router-dom */ "./node_modules/react-router-dom/esm/react-router-dom.js");
 /* harmony import */ var _src_store_store__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../src/store/store */ "./src/store/store.js");
-/* harmony import */ var react_redux__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! react-redux */ "./node_modules/react-redux/es/index.js");
+/* harmony import */ var _src_component_Header__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../src/component/Header */ "./src/component/Header.js");
+/* harmony import */ var react_redux__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! react-redux */ "./node_modules/react-redux/es/index.js");
 
 
 
 
 
 
-var Page = react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react_redux__WEBPACK_IMPORTED_MODULE_5__["Provider"], {
-  store: _src_store_store__WEBPACK_IMPORTED_MODULE_4__["default"]
-}, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react_router_dom__WEBPACK_IMPORTED_MODULE_3__["BrowserRouter"], null, _src_index__WEBPACK_IMPORTED_MODULE_2__["default"])); //注水
+
+var Page = react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react_redux__WEBPACK_IMPORTED_MODULE_6__["Provider"], {
+  store: Object(_src_store_store__WEBPACK_IMPORTED_MODULE_4__["getClientStore"])()
+}, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react_router_dom__WEBPACK_IMPORTED_MODULE_3__["BrowserRouter"], null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_src_component_Header__WEBPACK_IMPORTED_MODULE_5__["default"], null), _src_index__WEBPACK_IMPORTED_MODULE_2__["default"].map(function (route) {
+  return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react_router_dom__WEBPACK_IMPORTED_MODULE_3__["Route"], route);
+}))); //注水
 
 react_dom__WEBPACK_IMPORTED_MODULE_1___default.a.hydrate(Page, document.getElementById('root'));
 
@@ -40473,6 +40477,30 @@ module.exports = function(originalModule) {
 
 /***/ }),
 
+/***/ "./src/component/Header.js":
+/*!*********************************!*\
+  !*** ./src/component/Header.js ***!
+  \*********************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var react_router_dom__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react-router-dom */ "./node_modules/react-router-dom/esm/react-router-dom.js");
+
+
+/* harmony default export */ __webpack_exports__["default"] = (function () {
+  return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react_router_dom__WEBPACK_IMPORTED_MODULE_1__["Link"], {
+    to: "/"
+  }, "\u9996\u9875"), "|", react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react_router_dom__WEBPACK_IMPORTED_MODULE_1__["Link"], {
+    to: "/about"
+  }, "\u5173\u4E8E"));
+});
+
+/***/ }),
+
 /***/ "./src/container/about.js":
 /*!********************************!*\
   !*** ./src/container/about.js ***!
@@ -40526,8 +40554,11 @@ function Index(props) {
       setCount = _useState2[1];
 
   Object(react__WEBPACK_IMPORTED_MODULE_0__["useEffect"])(function () {
-    props.getIndexList();
+    if (!props.list.length) {
+      props.getIndexList();
+    }
   }, []);
+  console.log("props.list", props.list);
   return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("h1", null, "\u5F00\u8BFE\u5427&& ", count), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
     onClick: function onClick() {
       return setCount(count + 1);
@@ -40538,6 +40569,10 @@ function Index(props) {
     }, item.name);
   })));
 }
+
+Index.loadData = function (store) {
+  return store.dispatch(Object(_store_index__WEBPACK_IMPORTED_MODULE_2__["getIndexList"])());
+};
 
 /* harmony default export */ __webpack_exports__["default"] = (Object(react_redux__WEBPACK_IMPORTED_MODULE_1__["connect"])(function (state) {
   return {
@@ -40566,16 +40601,25 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
+ // export default (
+//   <div>
+//     <Route path="/" exact component={Index} />
+//     <Route path="/about" exact component={About} />
+//   </div>
+// )
 
-/* harmony default export */ __webpack_exports__["default"] = (react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react_router_dom__WEBPACK_IMPORTED_MODULE_1__["Route"], {
+/* harmony default export */ __webpack_exports__["default"] = ([{
   path: "/",
+  component: _container_index__WEBPACK_IMPORTED_MODULE_2__["default"],
+  //loadData: Index.loadData,
   exact: true,
-  component: _container_index__WEBPACK_IMPORTED_MODULE_2__["default"]
-}), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react_router_dom__WEBPACK_IMPORTED_MODULE_1__["Route"], {
+  key: "index"
+}, {
   path: "/about",
+  component: _container_about__WEBPACK_IMPORTED_MODULE_3__["default"],
   exact: true,
-  component: _container_about__WEBPACK_IMPORTED_MODULE_3__["default"]
-})));
+  key: "about"
+}]);
 
 /***/ }),
 
@@ -40640,11 +40684,13 @@ var defaultState = {
 /*!****************************!*\
   !*** ./src/store/store.js ***!
   \****************************/
-/*! exports provided: default */
+/*! exports provided: getClientStore, getServerStore */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "getClientStore", function() { return getClientStore; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "getServerStore", function() { return getServerStore; });
 /* harmony import */ var redux__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! redux */ "./node_modules/redux/es/redux.js");
 /* harmony import */ var redux_thunk__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! redux-thunk */ "./node_modules/redux-thunk/es/index.js");
 /* harmony import */ var _index__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./index */ "./src/store/index.js");
@@ -40653,9 +40699,16 @@ __webpack_require__.r(__webpack_exports__);
 
 var reducer = Object(redux__WEBPACK_IMPORTED_MODULE_0__["combineReducers"])({
   index: _index__WEBPACK_IMPORTED_MODULE_2__["default"]
-});
-var store = Object(redux__WEBPACK_IMPORTED_MODULE_0__["createStore"])(reducer, Object(redux__WEBPACK_IMPORTED_MODULE_0__["applyMiddleware"])(redux_thunk__WEBPACK_IMPORTED_MODULE_1__["default"]));
-/* harmony default export */ __webpack_exports__["default"] = (store);
+}); //const store = createStore(reducer, applyMiddleware(thunk))
+// export default store 
+
+var getClientStore = function getClientStore() {
+  var defaultStore = window._context ? window._context : {};
+  return Object(redux__WEBPACK_IMPORTED_MODULE_0__["createStore"])(reducer, defaultStore, Object(redux__WEBPACK_IMPORTED_MODULE_0__["applyMiddleware"])(redux_thunk__WEBPACK_IMPORTED_MODULE_1__["default"]));
+};
+var getServerStore = function getServerStore() {
+  return Object(redux__WEBPACK_IMPORTED_MODULE_0__["createStore"])(reducer, Object(redux__WEBPACK_IMPORTED_MODULE_0__["applyMiddleware"])(redux_thunk__WEBPACK_IMPORTED_MODULE_1__["default"]));
+};
 
 /***/ })
 
